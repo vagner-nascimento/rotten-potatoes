@@ -59,7 +59,7 @@ spec:
     spec:
       containers:
         - name: rotten-app
-          image: vagnernasc88/vero-movies:v1
+          image: vagnernasc88/vero-movies:v1 # Imagem é substituída pela action da pipe do GitHub
           ports:
           - containerPort: 5000
           env:
@@ -86,4 +86,4 @@ spec:
   - port: 80
     targetPort: 5000
     nodePort: 30000
-  type: NodePort
+  type: LoadBalancer
