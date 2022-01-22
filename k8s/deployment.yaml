@@ -1,0 +1,89 @@
+############
+# Database #
+############
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-dep
+spec:
+  selector:
+    matchLabels:
+      app: app-db
+  template:
+    metadata:
+      labels:
+       app: app-db
+    spec:
+      containers:
+       - name: mongo-db
+         image: mongo:5.0.5
+         ports:
+           - containerPort: 27017
+         env:
+           - name: MONGO_INITDB_ROOT_USERNAME
+             value: user
+           - name: MONGO_INITDB_ROOT_PASSWORD
+             value: pass
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-serv
+spec:
+  selector:
+    app: app-db
+  ports:
+    - port: 27017
+      targetPort: 27017
+  type: ClusterIP
+
+---
+###############
+# Application #
+###############
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-dep
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rotten-app
+  template:
+    metadata:
+      labels: 
+        app: rotten-app
+    spec:
+      containers:
+        - name: rotten-app
+          image: vagnernasc88/vero-movies:v1
+          ports:
+          - containerPort: 5000
+          env:
+            - name: MONGODB_DB
+              value: admin
+            - name: MONGODB_HOST
+              value: db-serv
+            - name: MONGODB_PORT
+              value: "27017"
+            - name: MONGODB_USERNAME
+              value: user
+            - name: MONGODB_PASSWORD
+              value: pass
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-serv
+spec:
+  selector:
+    app: rotten-app
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 30000
+  type: NodePort
