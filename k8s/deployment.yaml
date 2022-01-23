@@ -85,5 +85,5 @@ spec:
   ports:
   - port: 80
     targetPort: 5000
-    nodePort: 30000
+#    nodePort: 30000 # No cluster é desnecessário informar a porta
   type: LoadBalancer
